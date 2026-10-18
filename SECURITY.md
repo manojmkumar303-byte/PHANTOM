@@ -10,13 +10,13 @@ Please do not publish exploit details or sensitive personal data in a public iss
 
 ## Current design and limitations
 
-- The application derives an encryption key from a master password using scrypt with a random salt.
-- Note payloads are encrypted with Fernet authenticated encryption.
-- The current source uses a relatively modest scrypt work factor; stronger parameters and a tested vault migration path should be reviewed before a public security-focused release.
+- The vault derives an encryption key from the master password using scrypt with a random salt. The current work factor (N=16384, r=8, p=1) is modest and should be reviewed before a public security-focused release.
+- Note payloads use Fernet authenticated encryption.
+- Generated passwords use Python's \`secrets\` module, ensure each selected character class is represented, and are not automatically saved or logged.
+- Passwords explicitly copied by the user are placed on the operating system clipboard; the app does not control how long the OS retains them.
 - Auto-lock drops application references but cannot guarantee secure erasure of Python memory.
 - The app does not provide secure deletion guarantees, attachment encryption, cloud synchronization, or protection from malware running under the user's account.
-- Generated passwords, when implemented, should use Python's \`secrets\` module and should not be automatically stored or logged.
-- The application has not been independently audited.
+- The application has not been independently audited. Cryptographic library presence is not itself proof of correct security.
 
 ## Supported versions
 
