@@ -2,21 +2,26 @@
 
 ## Current application
 
-The supplied starter implementation is a single-process Python desktop application using Tkinter for its UI and the cryptography package for cryptographic operations.
+The application is a single-process Python desktop application using Tkinter for its UI and the cryptography package for cryptographic operations.
 
-- \`main.py\`: UI, vault lifecycle, encrypted persistence.
+- \`main.py\`: UI, vault lifecycle, encrypted persistence, and password generator.
 - \`requirements.txt\`: third-party runtime dependency.
 - \`run.bat\`: Windows setup and launch helper.
+- \`tests/test_core.py\`: unit tests for password generation and vault behavior.
 
-The initial version keeps the note collection in memory while unlocked and stores it as one encrypted payload. This is simple but means every save rewrites the entire payload.
+The note collection is held in memory while unlocked and stored as one encrypted payload. Every save rewrites that payload.
 
 ## Vault file
 
 The vault is a JSON envelope containing a format version, KDF identifier, cipher label, base64-encoded salt, and Fernet token. The notes JSON is encrypted before writing. The salt and metadata are not secret. Fernet authenticates ciphertext so tampering causes decryption to fail.
 
-The starter code uses scrypt with N=16384, r=8, p=1. Any change to KDF parameters must be versioned and must include a tested migration path, so existing vaults remain readable.
+The current source retains the starter format and scrypt setting (N=16384, r=8, p=1) for compatibility with existing vaults. This is a modest work factor and should be improved through a versioned, tested migration path before a security-focused release.
 
-Writes use a temporary file in the same directory followed by replacement. The implementation should validate the existing envelope before saving and detect external modifications to avoid overwriting a changed vault.
+Writes use a temporary file in the same directory followed by replacement. Before a save, the app checks the expected token to detect an external change and avoid blindly overwriting a changed vault.
+
+## Password generator
+
+The generator uses \`secrets.choice\` to choose characters and \`secrets.SystemRandom().shuffle\` to shuffle the result. It inserts one character from every enabled class before filling the remaining positions, so selected classes are represented. Generated values are only kept in the generator dialog until it closes, unless the user copies one to the OS clipboard.
 
 ## Design boundaries
 
